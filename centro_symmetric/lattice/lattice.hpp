@@ -4,15 +4,14 @@
 
 #ifndef LATTICE_HPP
 #define LATTICE_HPP
-#include <boost/filesystem.hpp>
-#include <boost/python.hpp>
+
 #include <cmath>
 #include <iostream>
 
 #include <random>
-#include <string>
-#include <vector>
-namespace fs = boost::filesystem;
+
+
+
 const auto PI=M_PI;
 
 class lattice_centro_symmetric
