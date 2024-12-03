@@ -16,14 +16,17 @@ if (len(sys.argv)!=3):
     print("wrong number of arguments.")
     exit(numArgErr)
 
-
+# print("entering load")
 jsonDataFromConf =json.loads(sys.argv[1])
 jsonFromSummary=json.loads(sys.argv[2])
 
 
 U_dipole_dataDir=jsonFromSummary["U_dipole_dataDir"]
+
 startingFileInd=jsonFromSummary["startingFileInd"]
-NStr=jsonFromSummary["N"]
+
+NStr=jsonDataFromConf["N"]
+
 N=int(NStr)
 if N<=0:
     print("invalid N="+str(N))
