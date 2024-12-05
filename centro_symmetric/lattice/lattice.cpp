@@ -167,3 +167,25 @@ double lattice_centro_symmetric::E(const int& n0, const int &n1,const int &m0,co
 
     return U(n0,n1,m0,m1)+V(n0,n1,m0,m1);
 }
+
+
+///
+/// @param n0
+/// @param n1
+/// @return interaction energy between the dipole on posistion [n0,n1] with other dipoles
+ double lattice_centro_symmetric::Energy_to_update(const int& n0, const int &n1)
+{
+
+    double E_tmp=0;
+
+    for(int m0=0;m0<N;m0++)
+    {
+        for(int m1=0;m1<N;m1++)
+        {
+        E_tmp+=this->E(n0,n1,m0,m1);// if n0==m0 and n1==m1, this value is 0,
+
+        }//end m1
+    }//end for m0
+
+    return E_tmp;
+}

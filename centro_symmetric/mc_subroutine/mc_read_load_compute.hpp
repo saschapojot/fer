@@ -8,6 +8,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
+#include <cfenv>
 #include <fstream>
 #include <random>
 #include <sstream>
@@ -24,7 +25,7 @@ class mc_computation
 private:
     int seed=11;
 public:
-    mc_computation(const std::string &cppInParamsFileName):e2(seed)
+    mc_computation(const std::string &cppInParamsFileName):e2(seed),distUnif01(0.0, 1.0)
     {
 
         std::ifstream file(cppInParamsFileName);
@@ -167,6 +168,13 @@ public:
                                                         std::default_delete<double[]>());
             this->ptr_dist_inv_3_mat= std::shared_ptr<double[]>(new double[N*N],
                                                         std::default_delete<double[]>());
+
+            this->U_data_ptr=std::shared_ptr<double[]>(new double[sweepToWrite ],
+                                                       std::default_delete<double[]>());
+
+            this->theta_data_ptr=std::shared_ptr<double[]>(new double[sweepToWrite*N*N ],
+                                                       std::default_delete<double[]>());
+
         }
         catch (const std::bad_alloc &e) {
             std::cerr << "Memory allocation error: " << e.what() << std::endl;
@@ -179,6 +187,7 @@ public:
         this->lat=lattice_centro_symmetric(J,N,a,ptr_theta_mat
          ,   ptr_dist_inv_5_mat, ptr_dist_inv_3_mat);
         std::cout << "T=" << T << std::endl;
+        std::cout<<"beta="<<beta<<std::endl;
         std::cout << "a=" << a << std::endl;
         std::cout << "N=" << N << std::endl;
         std::cout << "J=" << J << std::endl;
@@ -195,6 +204,21 @@ public:
 
 
 public:
+
+    void execute_mc_one_sweep(lattice_centro_symmetric & lat,  double& UCurr,
+         double &U_time, double& proposal_time,double &rand_time,double &acc_reject_time);
+    ///
+    /// @param UCurr
+    /// @param UNext
+    /// @param theta_Curr
+    /// @param theta_Next
+    /// @return acceptantce ratio
+    double acceptance_ratio_uni_theta_update(const double &interval_lower_bound, const double& interval_upper_bound,const double& UCurr, const double &UNext,const double&theta_Curr, const double &theta_Next);
+    ///
+    /// @param lat
+    /// @param pos position (n0*N+n1) of theta, to be updated
+    /// @return proposed new value of theta
+    double propose_uni(const lattice_centro_symmetric& lat, const int &pos);
     ///
     /// @param x proposed value
     /// @param y current value
@@ -225,6 +249,7 @@ public:
     std::string TDirRoot;
     std::string U_dipole_dataDir;
     std::ranlux24_base e2;
+    std::uniform_real_distribution<> distUnif01;
     int sweep_multiple;
     std::string out_U_path;
     std::string out_theta_path;
@@ -233,4 +258,9 @@ public:
     std::shared_ptr<double[]> ptr_theta_mat;//array containing values of angles
     std::shared_ptr<double[]> ptr_dist_inv_5_mat;//-3*J*a^{-3}*r^{-5},  V part
     std::shared_ptr<double[]> ptr_dist_inv_3_mat;//J*a^{-3}*r^{-3},  U part
+
+    //data
+    std::shared_ptr<double[]> U_data_ptr;
+    std::shared_ptr<double[]>theta_data_ptr;
+
 };
