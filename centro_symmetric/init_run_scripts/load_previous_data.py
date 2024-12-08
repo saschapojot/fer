@@ -67,7 +67,7 @@ def create_init_theta(U_dipole_dataDir):
     #
 
     # print("random_perturbations: "+str(random_perturbations))
-    outPath=U_dipole_dataDir+"/coordinate/"
+    outPath=U_dipole_dataDir+"/theta/"
 
     Path(outPath).mkdir(exist_ok=True,parents=True)
 

@@ -183,9 +183,13 @@ public:
             std::cerr << "Exception: " << e.what() << std::endl;
             std::exit(2);
         }
+        this->out_theta_path=U_dipole_dataDir+"/theta/";
+        this->out_U_path=U_dipole_dataDir+"/U/";
+        this->init_ptr_theta_mat();
 
         this->lat=lattice_centro_symmetric(J,N,a,ptr_theta_mat
          ,   ptr_dist_inv_5_mat, ptr_dist_inv_3_mat);
+        lat.print_array(lat.theta_mat,N);
         std::cout << "T=" << T << std::endl;
         std::cout<<"beta="<<beta<<std::endl;
         std::cout << "a=" << a << std::endl;
@@ -204,9 +208,11 @@ public:
 
 
 public:
+    void init_and_run();
+    void execute_mc( const int & flushNum);
 
-    void execute_mc_one_sweep(lattice_centro_symmetric & lat,  double& UCurr,
-         double &U_time, double& proposal_time,double &rand_time,double &acc_reject_time);
+
+    void execute_mc_one_sweep(lattice_centro_symmetric & lat,  double& UCurr);
     ///
     /// @param UCurr
     /// @param UNext
@@ -235,6 +241,9 @@ public:
     /// @return return a value within distance eps from x, on the open interval (leftEnd, rightEnd)
     double generate_uni_open_interval(const double &x, const double &leftEnd, const double &rightEnd, const double &eps);
 
+    void save_array_to_pickle(const std::shared_ptr<double[]> &ptr,const int& size,const std::string& filename);
+    void load_pickle_data(const std::string& filename, std::shared_ptr<double[]>& data_ptr, std::size_t size);
+    void init_ptr_theta_mat();
 
 public:
     double T;// temperature
@@ -260,7 +269,7 @@ public:
     std::shared_ptr<double[]> ptr_dist_inv_3_mat;//J*a^{-3}*r^{-3},  U part
 
     //data
-    std::shared_ptr<double[]> U_data_ptr;
-    std::shared_ptr<double[]>theta_data_ptr;
+    std::shared_ptr<double[]> U_data_ptr;//all U data
+    std::shared_ptr<double[]>theta_data_ptr;//all theta_mat data
 
 };

@@ -4,14 +4,12 @@
 
 int main(int argc, char *argv[])
 {
-    double J=2.0;
-    int N=5;
-    double a=1.1;
-    lattice_centro_symmetric lat(J,N,a);
-    lat.print_array(lat.dist_inv_3_mat,N);
-    std::cout<<"======================"<<std::endl;
-    lat.print_array(lat.dist_inv_5_mat,N);
-
+    if (argc != 2) {
+        std::cout << "wrong arguments" << std::endl;
+        std::exit(2);
+    }
+    auto mcObj=mc_computation(std::string(argv[1]));
+    mcObj.init_and_run();
 
 
 }
