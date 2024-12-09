@@ -86,6 +86,7 @@ def contents_to_conf(k):
         "\n",
         "effective_data_num_required=1000\n",
         "\n",
+        "#this is the data number in each pkl file\n"
         "sweep_to_write=2\n",
         "\n",
         "#within each flush,  sweep_to_write*sweep_multiple mc computations are executed\n",
