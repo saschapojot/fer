@@ -105,6 +105,7 @@ def auto_corrForOneColumn(vec,eps):
         same=True
     acfOfVecAbs=np.abs(acfOfVec)
     minAutc=np.min(acfOfVecAbs)
+    print(f"minAutc={minAutc}")
 
     lagVal=-1
     if minAutc<=eps:
@@ -236,16 +237,17 @@ pVec=[]
 statVec=[]
 numDataVec=[]
 
-lastFileNum=10
+lastFileNum=80
 eps=5e-2
 sameUTmp,lagUTmp,pUTmp,statUTmp,numDataPoints_U,startingFileInd=check_U_data_files_for_one_T(U_data_dir,summary_U_dipoleFile,lastFileNum, eps)
+print(f"lagUTmp={lagUTmp}")
 sameVec.append(sameUTmp)
 lagVec.append(lagUTmp)
 pVec.append(pUTmp)
 statVec.append(statUTmp)
 numDataVec.append(numDataPoints_U)
-item=check_dipole_files_for_one_T(theta_data_dir,summary_U_dipoleFile,lastFileNum,1e-5)
-
+item=check_dipole_files_for_one_T(theta_data_dir,summary_U_dipoleFile,lastFileNum,eps)
+print(f"item={item}")
 #check if lag==-1
 if item[-1]==-1 or lagUTmp==-1:
     msg="high correlation"
