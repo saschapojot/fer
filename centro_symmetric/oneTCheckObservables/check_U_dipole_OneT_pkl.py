@@ -87,21 +87,21 @@ def parseSummaryU_dipole(summary_U_dipoleFile):
     return startingFileInd
 
 
-def auto_corrForOneColumn(colVec,eps):
+def auto_corrForOneColumn(vec,eps):
     """
 
-    :param colVec: a vector of data
+    :param vec: a vector of data
     :param eps: correlation truncation value
     :return: auto-correlation length
     """
     same=False
     # eps=5e-2
-    NLags=int(len(colVec)*1/4)
+    NLags=int(len(vec)*1/4)
     # print("NLags="+str(NLags))
     with warnings.catch_warnings():
         warnings.filterwarnings("error")
     try:
-        acfOfVec=sm.tsa.acf(colVec,nlags=NLags)
+        acfOfVec=sm.tsa.acf(vec,nlags=NLags)
     except Warning as w:
         same=True
     acfOfVecAbs=np.abs(acfOfVec)
@@ -135,3 +135,43 @@ def ksTestOneVec(vec,lag):
     selectedVecPart1=vecToCompute[lenPart:]
     result=ks_2samp(selectedVecPart0,selectedVecPart1)
     return result.pvalue,result.statistic, lenPart*2
+
+
+
+def check_U_data_files_for_one_T(UData_dir,summary_U_dipoleFile,lastFileNum,eps):
+
+    U_sortedDataFilesToRead=sort_data_files_by_flushEnd(UData_dir)
+
+    if len(U_sortedDataFilesToRead)==0:
+        print("no data for U.")
+        exit(0)
+
+    startingFileInd=parseSummaryU_dipole(summary_U_dipoleFile)
+    if startingFileInd<0:
+        startingFileInd=len(U_sortedDataFilesToRead)-lastFileNum
+
+    startingFileName=U_sortedDataFilesToRead[startingFileInd]
+
+    with open(startingFileName,"rb") as fptr:
+        in_UArrStart=pickle.load(fptr)
+
+    arr_U=in_UArrStart
+
+    #read the rest of the pkl files
+    for pkl_file in U_sortedDataFilesToRead[(startingFileInd+1):]:
+        with open(pkl_file,"rb") as fptr:
+            in_UArr=pickle.load(fptr)
+
+        arr_U=np.append(arr_U,in_UArr)
+
+    sameUTmp,lagUTmp=auto_corrForOneColumn(arr_U,eps)
+    #if one lag==-1, then the auto-correlation is too large
+
+    if sameUTmp==True or lagUTmp==-1:
+        return [sameUTmp,lagUTmp,-1,-1,-1,-1]
+
+    pUTmp,statUTmp,lengthUTmp=ksTestOneVec(arr_U,lagUTmp)
+
+    numDataPoints=lengthUTmp
+
+    return [sameUTmp,lagUTmp,pUTmp,statUTmp,numDataPoints,startingFileInd]
