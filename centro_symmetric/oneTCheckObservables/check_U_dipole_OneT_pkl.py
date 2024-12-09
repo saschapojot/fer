@@ -40,8 +40,7 @@ N=int(jsonDataFromConf["N"])
 
 summary_U_dipoleFile=TDirRoot+"/summary_U_dipole.txt"
 
-lastFileNum=10
-print(f"U_dipole_dataDir={U_dipole_dataDir}")
+# print(f"U_dipole_dataDir={U_dipole_dataDir}")
 theta_data_dir=U_dipole_dataDir+"/theta/"
 U_data_dir=U_dipole_dataDir+"/U/"
 
@@ -175,3 +174,154 @@ def check_U_data_files_for_one_T(UData_dir,summary_U_dipoleFile,lastFileNum,eps)
     numDataPoints=lengthUTmp
 
     return [sameUTmp,lagUTmp,pUTmp,statUTmp,numDataPoints,startingFileInd]
+
+
+def check_dipole_files_for_one_T(theta_data_dir,summary_U_dipoleFile,lastFileNum,eps):
+
+
+    dipole_sortedDataFilesToRead=sort_data_files_by_flushEnd(theta_data_dir)
+
+    startingFileInd=parseSummaryU_dipole(summary_U_dipoleFile)
+
+    if startingFileInd<0:
+        startingFileInd=len(dipole_sortedDataFilesToRead)-lastFileNum
+
+    dipole_starting_file_name=dipole_sortedDataFilesToRead[startingFileInd]
+    with open(dipole_starting_file_name,"rb") as fptr:
+        theta_inArrStart=pickle.load(fptr)
+
+    theta_arr=theta_inArrStart
+    #read the rest of the theta pkl files
+    for pkl_file in dipole_sortedDataFilesToRead[(startingFileInd+1):]:
+        with open(pkl_file,"rb") as fptr:
+            theta_inArr=pickle.load(fptr)
+            theta_arr=np.append(theta_arr,theta_inArr)
+
+    theta_arr=theta_arr.reshape((-1,N**2))
+    cos_theta_arr=np.cos(theta_arr)
+    sin_theta_arr=np.sin(theta_arr)
+
+    px_mean_all=np.mean(cos_theta_arr,axis=1)
+    py_mean_all=np.mean(sin_theta_arr,axis=1)
+    # print(px_mean_all)
+
+    same_px_tmp,lag_px_tmp=auto_corrForOneColumn(px_mean_all,eps)
+
+    #large correlation for px
+    if same_px_tmp==True or lag_px_tmp==-1:
+        return [same_px_tmp,lag_px_tmp,-1,-1,-1,-1]
+
+    same_py_tmp,lag_py_tmp=auto_corrForOneColumn(py_mean_all,eps)
+
+    #large correlation for py
+    if same_py_tmp==True or lag_py_tmp==-1:
+        return [same_py_tmp,lag_py_tmp,-1,-1,-1,-1]
+
+    lag_pxpy=np.max((lag_px_tmp,lag_py_tmp))
+    p_px_tmp,stat_px_tmp,length_px_tmp=ksTestOneVec(px_mean_all,lag_pxpy)
+
+    p_py_tmp,stat_py_tmp,length_py_tmp=ksTestOneVec(py_mean_all,lag_pxpy)
+
+    numDataPoints=length_py_tmp
+
+    return [same_px_tmp,lag_pxpy,p_px_tmp,p_py_tmp,stat_px_tmp,stat_py_tmp,numDataPoints,startingFileInd]
+
+
+
+
+
+sameVec=[]
+lagVec=[]
+pVec=[]
+statVec=[]
+numDataVec=[]
+
+lastFileNum=10
+eps=5e-2
+sameUTmp,lagUTmp,pUTmp,statUTmp,numDataPoints_U,startingFileInd=check_U_data_files_for_one_T(U_data_dir,summary_U_dipoleFile,lastFileNum, eps)
+sameVec.append(sameUTmp)
+lagVec.append(lagUTmp)
+pVec.append(pUTmp)
+statVec.append(statUTmp)
+numDataVec.append(numDataPoints_U)
+item=check_dipole_files_for_one_T(theta_data_dir,summary_U_dipoleFile,lastFileNum,1e-5)
+
+#check if lag==-1
+if item[-1]==-1 or lagUTmp==-1:
+    msg="high correlation"
+    with open(summary_U_dipoleFile,"w+") as fptr:
+        fptr.writelines(msg)
+        exit(0)
+
+same_exist=any(sameVec)
+if same_exist==True:
+    with open(summary_U_dipoleFile,"w+") as fptr:
+        msg="error: same\n"
+        fptr.writelines(msg)
+        exit(sameErrCode)
+
+
+same_px_tmp,lag_pxpy,p_px_tmp,p_py_tmp,stat_px_tmp,stat_py_tmp,numDataPoints_pxpy,startingFileInd=item
+
+lagVec.append(lag_pxpy)
+pVec.append(p_px_tmp)
+pVec.append(p_py_tmp)
+
+statVec.append(stat_px_tmp)
+statVec.append(stat_py_tmp)
+
+numDataVec.append(numDataPoints_pxpy)
+
+
+if np.min(lagVec)<0:
+    msg="high correlation"
+    with open(summary_U_dipoleFile,"w+") as fptr:
+        fptr.writelines(msg)
+    exit(0)
+
+same_exist=any(sameVec)
+if same_exist==True:
+    with open(summary_U_dipoleFile,"w+") as fptr:
+        msg="error: same\n"
+        fptr.writelines(msg)
+        exit(sameErrCode)
+
+
+lagMax=np.max(lagVec)
+statThreshhold=0.1
+print("statVec="+str(statVec))
+print("pVec="+str(pVec))
+numDataPoints=np.min(numDataVec)
+
+if (np.max(statVec)<=statThreshhold or np.min(pVec)>=0.01) and numDataPoints>=200:
+    if numDataPoints>=effective_data_num_required:
+        newDataPointNum=0
+    else:
+        newDataPointNum=effective_data_num_required-numDataPoints
+    msg="equilibrium\n" \
+        +"lag="+str(lagMax)+"\n" \
+        +"numDataPoints="+str(numDataPoints)+"\n" \
+        +"startingFileInd="+str(startingFileInd)+"\n" \
+        +"newDataPointNum="+str(newDataPointNum)+"\n"
+    print(msg)
+    with open(summary_U_dipoleFile,"w+") as fptr:
+        fptr.writelines(msg)
+    exit(0)
+
+
+#continue
+continueMsg="continue\n"
+if np.max(statVec)>statThreshhold:
+    #not the same distribution
+    continueMsg+="stat value: "+str(np.max(statVec))+"\n"
+
+
+if numDataPoints<200:
+    #not enough data number
+    continueMsg+="numDataPoints="+str(numDataPoints)+" too low\n"
+    continueMsg+="lag="+str(lagMax)+"\n"
+
+print(continueMsg)
+with open(summary_U_dipoleFile,"w+") as fptr:
+    fptr.writelines(continueMsg)
+exit(0)

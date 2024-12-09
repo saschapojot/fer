@@ -170,7 +170,7 @@ void mc_computation::execute_mc( const int & flushNum){
 
     double UCurr=0;
     int flushThisFileStart=this->flushLastFile+1;
-    std::cout<<"entering mc"<<std::endl;
+//    std::cout<<"entering mc"<<std::endl;
     for (int fls = 0; fls < flushNum; fls++){
         const auto tMCStart{std::chrono::steady_clock::now()};
         for (int swp = 0; swp < sweepToWrite*sweep_multiple; swp++){
@@ -184,8 +184,8 @@ void mc_computation::execute_mc( const int & flushNum){
             }//end write
             const auto t_swp_End{std::chrono::steady_clock::now()};
             const std::chrono::duration<double> swp_elapsed_secondsAll{t_swp_End - t_swp_Start};
-            std::cout << "sweep " + std::to_string(swp)  + ": "
-                      << swp_elapsed_secondsAll.count()  << " s" << std::endl;
+//            std::cout << "sweep " + std::to_string(swp)  + ": "
+//                      << swp_elapsed_secondsAll.count()  << " s" << std::endl;
         }//end sweep for
         int flushEnd=flushThisFileStart+fls;
         std::string fileNameMiddle =  "flushEnd" + std::to_string(flushEnd);
