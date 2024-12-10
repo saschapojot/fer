@@ -189,7 +189,7 @@ public:
 
         this->lat=lattice_centro_symmetric(J,N,a,ptr_theta_mat
          ,   ptr_dist_inv_5_mat, ptr_dist_inv_3_mat);
-        lat.print_array(lat.theta_mat,N);
+//        lat.print_array(lat.theta_mat,N);
         std::cout << "T=" << T << std::endl;
         std::cout<<"beta="<<beta<<std::endl;
         std::cout << "a=" << a << std::endl;
