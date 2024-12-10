@@ -237,7 +237,7 @@ pVec=[]
 statVec=[]
 numDataVec=[]
 
-lastFileNum=1
+lastFileNum=500
 eps=5e-2
 sameUTmp,lagUTmp,pUTmp,statUTmp,numDataPoints_U,startingFileInd=check_U_data_files_for_one_T(U_data_dir,summary_U_dipoleFile,lastFileNum, eps)
 print(f"lagUTmp={lagUTmp}")
