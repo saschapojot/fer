@@ -17,7 +17,7 @@ def format_using_decimal(value, precision=10):
     return str(formatted_value)
 #
 
-if (len(sys.argv)!=2):
+if (len(sys.argv)!=3):
     print("wrong number of arguments")
     exit()
 
@@ -25,10 +25,12 @@ T=float(sys.argv[1])
 TStr=format_using_decimal(T)
 print("TStr="+TStr)
 
+N=int(sys.argv[2])
+NStr=format_using_decimal(N)
 #############################################
 #launch mc, i.e., giving initial conditions
 
-launchResult=subprocess.run(["python3", "launch_one_run.py", f"./dataAll/T{TStr}/run_T{TStr}.mc.conf"])
+launchResult=subprocess.run(["python3", "launch_one_run.py", f"./dataAll/N{NStr}/T{TStr}/run_T{TStr}.mc.conf"])
 print(launchResult.stdout)
 if launchResult.returncode!=0:
     print("error in launch one run: "+str(launchResult.returncode))
@@ -76,7 +78,7 @@ def terminate_process(signal_number, frame):
     sys.exit(0)  # Exit the script
 
 cppExecutable="./run_mc"
-cpp_process = subprocess.Popen([cppExecutable, f"./dataAll/T{TStr}/cppIn.txt" ],
+cpp_process = subprocess.Popen([cppExecutable, f"./dataAll/N{NStr}/T{TStr}/cppIn.txt" ],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, text=True)
 # Register the signal handler
@@ -107,7 +109,7 @@ finally:
 #############################################
 #check statistics
 
-stats_process=subprocess.Popen(["python3","-u", "check_after_one_run.py", f"./dataAll/T{TStr}/run_T{TStr}.mc.conf"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+stats_process=subprocess.Popen(["python3","-u", "check_after_one_run.py", f"./dataAll/N{NStr}/T{TStr}/run_T{TStr}.mc.conf"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 while True:
     output = stats_process.stdout.readline()
     if output == '' and stats_process.poll() is not None:
