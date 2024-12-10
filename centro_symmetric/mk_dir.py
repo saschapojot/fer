@@ -23,7 +23,7 @@ def format_using_decimal(value, precision=10):
 
 
 
-TVals=[1,3,5]#unit is K
+TVals=[1,3,5,10]#unit is K
 
 dataRoot="./dataAll/"
 dataOutDir=dataRoot
@@ -104,7 +104,7 @@ def contents_to_conf(k):
 
 
     ]
-    outDir=dataOutDir+"/T"+TStrAll[k]+"/"
+    outDir=dataOutDir+f"/N{NStr}/"+"/T"+TStrAll[k]+"/"
     Path(outDir).mkdir(exist_ok=True,parents=True)
     outConfName=outDir+"/run_T"+TStrAll[k]+".mc.conf"
     with open(outConfName,"w+") as fptr:
