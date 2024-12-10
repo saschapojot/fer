@@ -16,10 +16,19 @@ eta=epsxx-epsyy
 z=-1
 omega=-2*(beta+gamma*epsyy)*z
 
-theta1=-((T-Tc)*alpha1+2*beta*epsyy*gamma*epsyy**2)/(2*z**2)
+theta1=-((T-Tc)*alpha1+2*beta*epsyy+gamma*epsyy**2)/(2*z**2)
 
 theta2=-(2*(T-Tc)*alpha2*epsyy+2*(T-Tc)*alpha2*eta+omega*z+(beta+gamma*epsyy)*z**2)/(8*epsyy**3+16*epsyy**2*eta+12*epsyy*eta**2+4*eta**3)
 
+def dF_dz(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega):
+    val=2*((T-Tc)*alpha1+2*beta*epsyy+gamma*epsyy**2)*z+omega*eta+2*(beta+gamma*epsyy)*z*eta+4*theta1*z**3
+    return val
+def dF_d_eta(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega):
+    val=2*(T-Tc)*alpha2*epsyy+8*theta2*epsyy**3 \
+        +2*(8*theta2*epsyy**2+(T-Tc)*alpha2)*eta \
+        +omega*z+(beta+gamma*epsyy)*z**2 \
+        +12*theta2*epsyy*eta**2+4*theta2*eta**3
+    return val
 
 def d2F_d_eta2(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega):
     val=2*(8*theta2*epsyy**2+(T-Tc)*alpha2)+24*theta2*epsyy*eta+12*theta2*eta**2
@@ -49,5 +58,7 @@ def Hessian(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega):
 
     return H
 
-H=Hessian(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega)
-print(H)
+# H=Hessian(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega)
+# print(H)
+print(dF_d_eta(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega))
+print(dF_dz(T,Tc,alpha1,alpha2,beta,gamma,theta1,theta2,epsyy,eta,z,omega))
