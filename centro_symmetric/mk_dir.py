@@ -93,7 +93,7 @@ def contents_to_conf(k):
         "\n",
         "default_flush_num=10\n",
         "\n",
-        "h=5e-2\n",
+        "h=0.1\n",
         "\n",
         "#the configurations of the system are saved to file if the sweep number is a multiple of sweep_multiple\n",
         "\n",
