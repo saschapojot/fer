@@ -39,33 +39,33 @@ if launchResult.returncode!=0:
 
 #############################################
 #cmake ., make run_mc
-targetName="run_mc"
-compileErrCode=10
-cmake_process=subprocess.Popen(["cmake","."], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-while True:
-    output = cmake_process.stdout.readline()
-    if output == '' and cmake_process.poll() is not None:
-        break
-    if output:
-        print(output.strip())
-stdout, stderr = cmake_process.communicate()
-if stdout:
-    print(stdout.strip())
-if stderr:
-    print(stderr.strip())
-
-make_process=subprocess.Popen(["make",targetName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-while True:
-    output = make_process.stdout.readline()
-    if output == '' and make_process.poll() is not None:
-        break
-    if output:
-        print(output.strip())
-stdout, stderr = make_process.communicate()
-if stdout:
-    print(stdout.strip())
-if stderr:
-    print(stderr.strip())
+# targetName="run_mc"
+# compileErrCode=10
+# cmake_process=subprocess.Popen(["cmake","."], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+# while True:
+#     output = cmake_process.stdout.readline()
+#     if output == '' and cmake_process.poll() is not None:
+#         break
+#     if output:
+#         print(output.strip())
+# stdout, stderr = cmake_process.communicate()
+# if stdout:
+#     print(stdout.strip())
+# if stderr:
+#     print(stderr.strip())
+#
+# make_process=subprocess.Popen(["make",targetName], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+# while True:
+#     output = make_process.stdout.readline()
+#     if output == '' and make_process.poll() is not None:
+#         break
+#     if output:
+#         print(output.strip())
+# stdout, stderr = make_process.communicate()
+# if stdout:
+#     print(stdout.strip())
+# if stderr:
+#     print(stderr.strip())
 #############################################
 
 
